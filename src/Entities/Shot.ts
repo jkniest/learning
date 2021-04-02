@@ -1,5 +1,6 @@
 import Entity from "./Entity";
 import Simulation from "../Simulations/Simulation";
+import Manager from "../Manager";
 
 export default class Shot extends Entity {
     private readonly red: number = 0;
@@ -18,7 +19,7 @@ export default class Shot extends Entity {
         blue: number,
         simulation: Simulation
     ) {
-        super(posX, posY);
+        super(posX, posY, 15, 15);
 
         this.rotation = rotation;
         this.red = red;
@@ -29,10 +30,19 @@ export default class Shot extends Entity {
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.beginPath();
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
         ctx.fillStyle = `rgb(${this.red}, ${this.green}, ${this.blue})`;
         ctx.arc(this.posX, this.posY, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
+
+        if (Manager.Instance.collisionBoxes) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'green';
+            ctx.rect(this.leftX, this.topY, this.width, this.height);
+            ctx.stroke();
+        }
     }
 
     update(deltaTime: number): void {
@@ -42,6 +52,15 @@ export default class Shot extends Entity {
         if (this.posX > 600 || this.posX < 0 || this.posY > 600 || this.posY < 0) {
             this.simulation.removeEntity(this);
         }
+
+        // check for collisions
+        this.simulation.getAllFighter().forEach(fighter => {
+            if (this.collidesWith(fighter)) {
+                fighter.kill();
+                this.simulation.removeEntity(this);
+                this.simulation.lose(fighter);
+            }
+        });
     }
 
 }

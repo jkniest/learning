@@ -6,11 +6,13 @@ import Manager from "../Manager";
 export default class Simulation {
     protected entities: Entity[] = [];
     protected lastFrame = 0;
-    protected timer: number = 5;
+    protected timer: number = 60;
     protected running: boolean = true;
     protected winner: Fighter;
+    protected killed: boolean = false;
 
-    constructor() {
+    constructor(maxTime: number) {
+        this.timer = maxTime;
         this.spawnFighters();
 
         this.lastFrame = new Date().getTime();
@@ -80,5 +82,16 @@ export default class Simulation {
     protected pickRandomWinner(): void
     {
         this.winner = this.getAllFighter()[Math.round(Math.random())];
+    }
+
+    public lose(loser: Fighter) {
+        this.winner = this.getAllFighter().filter(
+            fighter => fighter != loser
+        )[0];
+
+        this.running = false;
+        this.killed = true;
+
+        Manager.Instance.report(this);
     }
 }

@@ -5,6 +5,7 @@ import Simulation from "../../Simulations/Simulation";
 
 // @ts-ignore
 import names from '../../names.json';
+import Manager from "../../Manager";
 
 export default class Fighter extends Entity {
     private readonly red: number = 0;
@@ -17,7 +18,8 @@ export default class Fighter extends Entity {
     private shootDelay = 1;
     private network: Network;
     private enemy: Fighter;
-    private name: string;
+    private killed: boolean = false;
+    private readonly name: string;
 
     public readonly SPEED = 3;
 
@@ -40,20 +42,22 @@ export default class Fighter extends Entity {
         green?: number,
         blue?: number
     ) {
-        super(posX, posY);
+        super(posX, posY, 60, 60);
 
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
         this.blue = blue ?? (Math.random() * 255);
         this.simulation = simulation;
 
-        this.network = new Network(9, 4, 7, networkCanvas);
+        this.network = new Network(9, 6, 7, networkCanvas);
         this.preview = previewCanvas?.getContext('2d');
 
         this.name = names[Math.round(Math.random() * names.length)];
         if (nameField) {
             nameField.innerText = this.name;
         }
+
+        this.rotation = Math.random() * 360;
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {
@@ -68,6 +72,25 @@ export default class Fighter extends Entity {
         ctx.fill();
 
         ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        if (this.killed) {
+            ctx.beginPath();
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = 'red';
+            ctx.moveTo(this.leftX, this.topY);
+            ctx.lineTo(this.rightX, this.bottomY);
+
+            ctx.moveTo(this.rightX, this.topY);
+            ctx.lineTo(this.leftX, this.bottomY);
+            ctx.stroke();
+        }
+
+        if (Manager.Instance.collisionBoxes) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'green';
+            ctx.rect(this.leftX, this.topY, this.width, this.height);
+            ctx.stroke();
+        }
 
         this.network.draw();
         this.drawPreview();
@@ -202,5 +225,9 @@ export default class Fighter extends Entity {
 
     public getName(): string {
         return this.name;
+    }
+
+    public kill(): void {
+        this.killed = true;
     }
 }

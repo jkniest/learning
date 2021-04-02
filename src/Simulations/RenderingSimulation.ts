@@ -4,8 +4,8 @@ export default class RenderingSimulation extends Simulation {
     protected readonly canvas: HTMLCanvasElement;
     protected readonly ctx: CanvasRenderingContext2D;
 
-    constructor(canvas: HTMLCanvasElement) {
-        super();
+    constructor(maxTime: number, canvas: HTMLCanvasElement) {
+        super(maxTime);
 
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -44,7 +44,7 @@ export default class RenderingSimulation extends Simulation {
         this.ctx.font = '36px Arial';
         this.ctx.fillStyle = 'white';
 
-        const winLabel = `Draw. ${this.winner.getName()} wins!`;
+        const winLabel = `${this.killed ? 'Defeated!' : 'Draw!'} ${this.winner.getName()} wins!`;
         const winSize = this.ctx.measureText(winLabel);
 
         this.ctx.fillText(

@@ -14,7 +14,7 @@ export default class PrimarySimulation extends RenderingSimulation {
 
         this.addEntity(new Fighter(
             400,
-            450,
+            150, // 450,
             this,
             document.getElementById('network2') as HTMLCanvasElement,
             document.getElementById('preview2') as HTMLCanvasElement,
