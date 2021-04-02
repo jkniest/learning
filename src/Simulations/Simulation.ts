@@ -12,8 +12,16 @@ export default class Simulation {
     protected killed: boolean = false;
     protected stopped: boolean = false;
 
-    constructor(maxTime: number) {
+    constructor(maxTime: number, waiting: boolean = false) {
         this.timer = maxTime;
+        if (waiting) {
+            return;
+        }
+
+        this.start();
+    }
+
+    public start(): void {
         this.spawnFighters();
 
         this.lastFrame = new Date().getTime();
@@ -71,7 +79,7 @@ export default class Simulation {
         }
     }
 
-    private terminate() {
+    protected terminate() {
         this.pickRandomWinner();
         this.running = false;
 

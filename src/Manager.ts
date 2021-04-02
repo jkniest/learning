@@ -8,7 +8,7 @@ export default class Manager {
 
     private parallelSimulations: number = 100;
     private speed: number = 1;
-    private time: number = 30;
+    private time: number = 5;
     private showCollisionBoxes: boolean = false;
 
     private counterRunning: HTMLSpanElement;
@@ -41,7 +41,7 @@ export default class Manager {
             this.toggleCollisionBoxes(buttonCollision);
         }
 
-        //this.startSimulations();
+        this.startSimulations();
     }
 
     private startSimulations(): void {
@@ -111,6 +111,10 @@ export default class Manager {
         document.getElementById('panel-result').classList.remove('hidden');
 
         new Result(this.simulations);
+    }
+
+    public getMaxTime(): number {
+        return this.time;
     }
 }
 

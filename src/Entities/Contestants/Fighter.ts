@@ -12,6 +12,9 @@ export default class Fighter extends Entity {
     private readonly green: number = 0;
     private readonly blue: number = 0;
 
+    private readonly startX;
+    private readonly startY;
+
     private preview: CanvasRenderingContext2D | null;
     private readonly simulation: Simulation;
 
@@ -40,24 +43,30 @@ export default class Fighter extends Entity {
         nameField?: HTMLHeadingElement,
         red?: number,
         green?: number,
-        blue?: number
+        blue?: number,
+        name?: string,
+        serializedNetwork?: string
     ) {
         super(posX, posY, 60, 60);
+
+        this.startX = posX;
+        this.startY = posY;
 
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
         this.blue = blue ?? (Math.random() * 255);
         this.simulation = simulation;
 
-        this.network = new Network(9, 6, 7, networkCanvas);
+        this.network = serializedNetwork
+            ? Network.fromSerialized(serializedNetwork, networkCanvas)
+            : new Network(9, 6, 7, networkCanvas);
+
         this.preview = previewCanvas?.getContext('2d');
 
-        this.name = names[Math.round(Math.random() * names.length)];
+        this.name = name ?? names[Math.round(Math.random() * names.length)];
         if (nameField) {
             nameField.innerText = this.name;
         }
-
-        this.rotation = Math.random() * 360;
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {
@@ -229,5 +238,33 @@ export default class Fighter extends Entity {
 
     public kill(): void {
         this.killed = true;
+    }
+
+    public getNetwork(): Network {
+        return this.network;
+    }
+
+    public getRed(): number {
+        return this.red;
+    }
+
+    public getGreen(): number {
+        return this.green;
+    }
+
+    public getBlue(): number {
+        return this.blue;
+    }
+
+    public getEnemy(): Fighter {
+        return this.enemy;
+    }
+
+    public getStartX(): number {
+        return this.startX;
+    }
+
+    public getStartY(): number {
+        return this.startY;
     }
 }

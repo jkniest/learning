@@ -4,8 +4,8 @@ export default class RenderingSimulation extends Simulation {
     protected readonly canvas: HTMLCanvasElement;
     protected readonly ctx: CanvasRenderingContext2D;
 
-    constructor(maxTime: number, canvas: HTMLCanvasElement) {
-        super(maxTime);
+    constructor(maxTime: number, canvas: HTMLCanvasElement, waiting: boolean = false) {
+        super(maxTime, waiting);
 
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');

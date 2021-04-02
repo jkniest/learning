@@ -33,6 +33,17 @@ export default class Network {
         }
     }
 
+    public static fromSerialized(serialized: string, canvas?: HTMLCanvasElement): Network {
+        const data = JSON.parse(serialized);
+
+        const network = new Network(data.inputNodes, data.hiddenNodes, data.outputNodes, canvas);
+        network.weightsHidden = data.weightsHidden;
+        network.weightsOutput = data.weightsOutput;
+        network.biases = data.biases;
+
+        return network;
+    }
+
     public calculate(inputs: number[]): number {
         let highestIndex = 0;
         let highestValue = Number.MIN_VALUE;
@@ -93,5 +104,16 @@ export default class Network {
 
     private sigmoid(x: number): number {
         return 1 / (1 + Math.pow(Math.E, -x));
+    }
+
+    public serialize(): string {
+        return JSON.stringify({
+            inputNodes: this.inputNodes,
+            hiddenNodes: this.hiddenNodes,
+            outputNodes: this.outputNodes,
+            weightsHidden: this.weightsHidden,
+            weightsOutput: this.weightsOutput,
+            biases: this.biases
+        });
     }
 }

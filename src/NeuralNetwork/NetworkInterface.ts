@@ -155,6 +155,10 @@ export default class NetworkInterface {
         this.ctx.font = '14px Arial';
         const cellHeightInput = (height + paddingY) / inputNodes;
         for (let i = 0; i < inputNodes; i++) {
+            if (this.inputs.length <= i) {
+                break;
+            }
+
             const w = this.ctx.measureText('this.inputs[i].toFixed(2)').width;
             this.ctx.fillText(this.inputs[i].toFixed(2), paddingX + 5 - w / 2, paddingY + 20 + cellHeightInput * i);
         }
