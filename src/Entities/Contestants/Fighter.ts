@@ -1,16 +1,19 @@
-import Entity from "./Entity";
-import Simulation from "../Simulation";
-import Shot from "./Shot";
-import Network from "../NeuralNetwork/Network";
+import Entity from "../Entity";
+import Shot from "../Shot";
+import Network from "../../NeuralNetwork/Network";
+import Simulation from "../../Simulations/Simulation";
 
 export default class Fighter extends Entity {
     private readonly red: number = 0;
     private readonly green: number = 0;
     private readonly blue: number = 0;
+
+    private readonly preview: CanvasRenderingContext2D | null;
+    private readonly simulation: Simulation;
+
     private shootDelay = 1;
     private network: Network;
     private enemy: Fighter;
-    private preview: CanvasRenderingContext2D;
     private name: string;
 
     public readonly SPEED = 3;
@@ -26,9 +29,10 @@ export default class Fighter extends Entity {
     constructor(
         posX: number,
         posY: number,
-        networkCanvas: HTMLCanvasElement,
-        previewCanvas: HTMLCanvasElement,
-        nameField: HTMLHeadingElement,
+        simulation: Simulation,
+        networkCanvas?: HTMLCanvasElement,
+        previewCanvas?: HTMLCanvasElement,
+        nameField?: HTMLHeadingElement,
         red?: number,
         green?: number,
         blue?: number
@@ -38,14 +42,18 @@ export default class Fighter extends Entity {
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
         this.blue = blue ?? (Math.random() * 255);
+        this.simulation = simulation;
+
         this.network = new Network(9, 4, 7, networkCanvas);
-        this.preview = previewCanvas.getContext('2d');
+        this.preview = previewCanvas?.getContext('2d');
 
         fetch('https://randomuser.me/api/')
             .then(response => response.json())
             .then(data => {
                 this.name = data.results[0].name.first;
-                nameField.innerText = this.name;
+                if (nameField) {
+                    nameField.innerText = this.name;
+                }
             })
     }
 
@@ -67,6 +75,10 @@ export default class Fighter extends Entity {
     }
 
     private drawPreview(): void {
+        if (!this.preview) {
+            return;
+        }
+
         this.preview.clearRect(0, 0, 100, 100);
 
         this.preview.translate(46, 50);
@@ -84,12 +96,12 @@ export default class Fighter extends Entity {
 
     public update(deltaTime: number): void {
         if (!this.enemy) {
-            this.enemy = Simulation.Instance.getAllFighter().filter(
+            this.enemy = this.simulation.getAllFighter().filter(
                 enemy => enemy != this
             )[0] as Fighter;
         }
 
-        this.shootDelay -= deltaTime * Simulation.Instance.getSpeed();
+        this.shootDelay -= deltaTime * this.simulation.getSpeed();
 
         const nearestShot = this.getNearestShot();
         const action = this.network.calculate([
@@ -106,35 +118,35 @@ export default class Fighter extends Entity {
 
         switch (action) {
             case this.ACTION_MOVE_RIGHT:
-                this.posX += this.SPEED * Simulation.Instance.getSpeed();
+                this.posX += this.SPEED * this.simulation.getSpeed();
                 if (this.posX > 600) {
                     this.posX = 600;
                 }
                 break;
 
             case this.ACTION_MOVE_LEFT:
-                this.posX -= this.SPEED * Simulation.Instance.getSpeed();
+                this.posX -= this.SPEED * this.simulation.getSpeed();
                 if (this.posX < 0) {
                     this.posX = 0;
                 }
                 break;
 
             case this.ACTION_MOVE_UP:
-                this.posY -= this.SPEED * Simulation.Instance.getSpeed();
+                this.posY -= this.SPEED * this.simulation.getSpeed();
                 if (this.posY < 0) {
                     this.posY = 0;
                 }
                 break;
 
             case this.ACTION_MOVE_DOWN:
-                this.posY += this.SPEED  * Simulation.Instance.getSpeed();
+                this.posY += this.SPEED * this.simulation.getSpeed();
                 if (this.posY > 600) {
                     this.posY = 600;
                 }
                 break;
 
             case this.ACTION_ROTATE_LEFT:
-                this.rotation -= this.SPEED * Simulation.Instance.getSpeed();
+                this.rotation -= this.SPEED * this.simulation.getSpeed();
                 if (this.rotation < 0) {
                     this.rotation = 360 - this.rotation;
                 }
@@ -142,7 +154,7 @@ export default class Fighter extends Entity {
                 break;
 
             case this.ACTION_ROTATE_RIGHT:
-                this.rotation += this.SPEED * Simulation.Instance.getSpeed();
+                this.rotation += this.SPEED * this.simulation.getSpeed();
                 if (this.rotation > 360) {
                     this.rotation = this.rotation - 360;
                 }
@@ -160,24 +172,24 @@ export default class Fighter extends Entity {
         const spawnX = this.posX + Math.cos(this.rotation * Math.PI / 180) * 60;
         const spawnY = this.posY + Math.sin(this.rotation * Math.PI / 180) * 60;
 
-        Simulation.Instance.addEntity(
-            new Shot(spawnX, spawnY, this.rotation, this.red, this.green, this.blue)
+        this.simulation.addEntity(
+            new Shot(spawnX, spawnY, this.rotation, this.red, this.green, this.blue, this.simulation)
         );
 
         this.shootDelay = 1;
     }
 
-    private getNearestShot(): Entity|null {
-        const all = Simulation.Instance.getAllShots();
+    private getNearestShot(): Entity | null {
+        const all = this.simulation.getAllShots();
 
-        let target: Entity|null = null;
+        let target: Entity | null = null;
         let lastDistance: number = Number.MAX_VALUE;
 
-        for(let shot of all) {
+        for (let shot of all) {
             const distance = Math.sqrt(
-                Math.pow(shot.getPosX() - this.posX ,2)
+                Math.pow(shot.getPosX() - this.posX, 2)
                 +
-                Math.pow(shot.getPosY() - this.posY ,2)
+                Math.pow(shot.getPosY() - this.posY, 2)
             );
 
             if (distance < lastDistance) {
@@ -187,5 +199,9 @@ export default class Fighter extends Entity {
         }
 
         return target;
+    }
+
+    public getName(): string {
+        return this.name;
     }
 }

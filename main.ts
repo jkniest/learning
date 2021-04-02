@@ -1,4 +1,2 @@
 import './style.css'
-import Simulation from "./src/Simulation";
-
-new Simulation();
+import "./src/Manager";

@@ -11,7 +11,7 @@ export default class Network {
 
     private nInterface?: NetworkInterface;
 
-    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, canvas: HTMLCanvasElement) {
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, canvas?: HTMLCanvasElement) {
         this.inputNodes = inputNodes;
         this.hiddenNodes = hiddenNodes;
         this.outputNodes = outputNodes;
@@ -28,7 +28,9 @@ export default class Network {
             this.biases[i] = Math.random();
         }
 
-        this.nInterface = new NetworkInterface(this, canvas);
+        if (canvas) {
+            this.nInterface = new NetworkInterface(this, canvas);
+        }
     }
 
     public calculate(inputs: number[]): number {
