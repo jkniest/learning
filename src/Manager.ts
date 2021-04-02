@@ -41,7 +41,7 @@ export default class Manager {
             this.toggleCollisionBoxes(buttonCollision);
         }
 
-        this.startSimulations();
+        //this.startSimulations();
     }
 
     private startSimulations(): void {
