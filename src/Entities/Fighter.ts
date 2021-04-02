@@ -10,6 +10,8 @@ export default class Fighter extends Entity {
     private shootDelay = 1;
     private network: Network;
     private enemy: Fighter;
+    private preview: CanvasRenderingContext2D;
+    private name: string;
 
     public readonly SPEED = 3;
 
@@ -21,13 +23,30 @@ export default class Fighter extends Entity {
     public readonly ACTION_ROTATE_LEFT: number = 5;
     public readonly ACTION_SHOOT: number = 6;
 
-    constructor(posX: number, posY: number, render: boolean = false, red?: number, green?: number, blue?: number) {
+    constructor(
+        posX: number,
+        posY: number,
+        networkCanvas: HTMLCanvasElement,
+        previewCanvas: HTMLCanvasElement,
+        nameField: HTMLHeadingElement,
+        red?: number,
+        green?: number,
+        blue?: number
+    ) {
         super(posX, posY);
 
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
         this.blue = blue ?? (Math.random() * 255);
-        this.network = new Network(9, 4, 7, render);
+        this.network = new Network(9, 4, 7, networkCanvas);
+        this.preview = previewCanvas.getContext('2d');
+
+        fetch('https://randomuser.me/api/')
+            .then(response => response.json())
+            .then(data => {
+                this.name = data.results[0].name.first;
+                nameField.innerText = this.name;
+            })
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {
@@ -44,6 +63,23 @@ export default class Fighter extends Entity {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
 
         this.network.draw();
+        this.drawPreview();
+    }
+
+    private drawPreview(): void {
+        this.preview.clearRect(0, 0, 100, 100);
+
+        this.preview.translate(46, 50);
+        this.preview.rotate(this.rotation * Math.PI / 180);
+        this.preview.translate(-46, -50);
+
+        this.preview.beginPath();
+        this.preview.fillStyle = `rgb(${this.red}, ${this.green}, ${this.blue})`;
+        this.preview.arc(50 - 4, 50, 24, 0, Math.PI * 2);
+        this.preview.rect(50 - 4 + 15, 50 - 5, 26, 8);
+        this.preview.fill();
+
+        this.preview.setTransform(1, 0, 0, 1, 0, 0);
     }
 
     public update(deltaTime: number): void {
@@ -53,7 +89,7 @@ export default class Fighter extends Entity {
             )[0] as Fighter;
         }
 
-        this.shootDelay -= deltaTime;
+        this.shootDelay -= deltaTime * Simulation.Instance.getSpeed();
 
         const nearestShot = this.getNearestShot();
         const action = this.network.calculate([
@@ -70,35 +106,35 @@ export default class Fighter extends Entity {
 
         switch (action) {
             case this.ACTION_MOVE_RIGHT:
-                this.posX += this.SPEED;
+                this.posX += this.SPEED * Simulation.Instance.getSpeed();
                 if (this.posX > 600) {
                     this.posX = 600;
                 }
                 break;
 
             case this.ACTION_MOVE_LEFT:
-                this.posX -= this.SPEED;
+                this.posX -= this.SPEED * Simulation.Instance.getSpeed();
                 if (this.posX < 0) {
                     this.posX = 0;
                 }
                 break;
 
             case this.ACTION_MOVE_UP:
-                this.posY -= this.SPEED;
+                this.posY -= this.SPEED * Simulation.Instance.getSpeed();
                 if (this.posY < 0) {
                     this.posY = 0;
                 }
                 break;
 
             case this.ACTION_MOVE_DOWN:
-                this.posY += this.SPEED;
+                this.posY += this.SPEED  * Simulation.Instance.getSpeed();
                 if (this.posY > 600) {
                     this.posY = 600;
                 }
                 break;
 
             case this.ACTION_ROTATE_LEFT:
-                this.rotation -= this.SPEED;
+                this.rotation -= this.SPEED * Simulation.Instance.getSpeed();
                 if (this.rotation < 0) {
                     this.rotation = 360 - this.rotation;
                 }
@@ -106,7 +142,7 @@ export default class Fighter extends Entity {
                 break;
 
             case this.ACTION_ROTATE_RIGHT:
-                this.rotation += this.SPEED;
+                this.rotation += this.SPEED * Simulation.Instance.getSpeed();
                 if (this.rotation > 360) {
                     this.rotation = this.rotation - 360;
                 }

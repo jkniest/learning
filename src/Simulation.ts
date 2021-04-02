@@ -9,12 +9,26 @@ export default class Simulation {
     private readonly canvas: HTMLCanvasElement;
     private readonly context: CanvasRenderingContext2D;
     private lastFrame = 0;
+    private speed: number = 1;
 
     constructor() {
         Simulation.Instance = this;
 
-        this.addEntity(new Fighter(200, 150, true));
-        this.addEntity(new Fighter(400, 450, true));
+        this.addEntity(new Fighter(
+            200,
+            150,
+            document.getElementById('network') as HTMLCanvasElement,
+            document.getElementById('preview') as HTMLCanvasElement,
+            document.getElementById('name') as HTMLHeadingElement
+        ));
+
+        this.addEntity(new Fighter(
+            400,
+            450,
+            document.getElementById('network2') as HTMLCanvasElement,
+            document.getElementById('preview2') as HTMLCanvasElement,
+            document.getElementById('name2') as HTMLHeadingElement
+        ));
 
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.context = this.canvas.getContext('2d');
@@ -55,5 +69,9 @@ export default class Simulation {
     public removeEntity(entity: Entity): void {
         const index = this.entities.indexOf(entity);
         this.entities.splice(index, 1);
+    }
+
+    public getSpeed(): number {
+        return this.speed;
     }
 }

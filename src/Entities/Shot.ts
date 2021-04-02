@@ -24,8 +24,8 @@ export default class Shot extends Entity {
     }
 
     update(deltaTime: number): void {
-        this.posX += Math.cos(this.rotation * Math.PI / 180) * 3;
-        this.posY += Math.sin(this.rotation * Math.PI / 180) * 3;
+        this.posX += Math.cos(this.rotation * Math.PI / 180) * 3 * Simulation.Instance.getSpeed();
+        this.posY += Math.sin(this.rotation * Math.PI / 180) * 3 * Simulation.Instance.getSpeed();
 
         if (this.posX > 600 || this.posX < 0 || this.posY > 600 || this.posY < 0) {
             Simulation.Instance.removeEntity(this);

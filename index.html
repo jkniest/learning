@@ -9,10 +9,31 @@
     <body class="p-10">
         <div class="flex bg-gray-300">
             <canvas id="canvas" width="600px" height="600px" class="bg-gray-400 w-[600px] h-[600px]"></canvas>
-            <div class="p-8">
+            <div class="p-8 w-full">
                 <h1 class="text-3xl">Generation 1</h1>
 
-                <canvas id="network" width="600px" height="400px" class="mt-10 bg-gray-100"></canvas>
+                <div class="flex justify-between mt-10 w-full">
+                    <div>
+                        <canvas id="network" width="480px" height="300px" class="bg-gray-100"></canvas>
+
+                        <div class="flex">
+                            <canvas id="preview" width="100px" height="100px" class="bg-red-50 mt-3"></canvas>
+                            <div class="p-3">
+                                <h2 id="name" class="text-2xl">Fighter 1</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <canvas id="network2" width="480px" height="300px" class="bg-gray-100"></canvas>
+
+                        <div class="flex">
+                            <canvas id="preview2" width="100px" height="100px" class="bg-red-50 mt-3"></canvas>
+                            <div class="p-3">
+                                <h2 id="name2" class="text-2xl">Fighter 2</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

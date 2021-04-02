@@ -5,6 +5,8 @@ export default class NetworkInterface {
     private ctx: CanvasRenderingContext2D;
     private activeOutput: number = 0;
     private inputs: number[] = [];
+    private canvasWidth: number;
+    private canvasHeight: number;
 
     private readonly ACTIONS: string[] = [
         'Move right',
@@ -16,11 +18,12 @@ export default class NetworkInterface {
         'Shoot'
     ];
 
-    constructor(network: Network) {
+    constructor(network: Network, canvas: HTMLCanvasElement) {
         this.network = network;
 
-        const canvas = document.getElementById('network') as HTMLCanvasElement;
         this.ctx = canvas.getContext('2d');
+        this.canvasWidth = canvas.width;
+        this.canvasHeight = canvas.height;
     }
 
     public updateInputs(inputs: number[]) {
@@ -37,17 +40,17 @@ export default class NetworkInterface {
         const paddingX = 100;
         const paddingY = 20;
 
-        const height = 400 - (paddingY * 2);
+        const height = this.canvasHeight - (paddingY * 2);
 
         const inputNodes = this.network.getInputNodes();
         const outputNodes = this.network.getOutputNodes();
         const hiddenNodes = this.network.getHiddenNodes();
 
+        this.renderInputToHiddenWeights(height, inputNodes, hiddenNodes, paddingX, paddingY);
+        this.renderHiddenToOutputWeights(height, hiddenNodes, outputNodes, paddingX, paddingY);
         this.renderInput(height, inputNodes, paddingX, paddingY);
         this.renderHidden(height, hiddenNodes, paddingY);
         this.renderOutput(height, outputNodes, paddingX, paddingY);
-        this.renderInputToHiddenWeights(height, inputNodes, hiddenNodes, paddingX, paddingY);
-        this.renderHiddenToOutputWeights(height, hiddenNodes, outputNodes, paddingX, paddingY);
         this.renderOutputLabels(height, paddingY, outputNodes, paddingX);
         this.renderInputLabels(height, paddingY, inputNodes, paddingX);
     }
@@ -70,7 +73,13 @@ export default class NetworkInterface {
 
         const cellHeightHidden = (height + paddingY) / hiddenNodes;
         for (let i = 0; i < hiddenNodes; i++) {
-            this.ctx.arc(300, paddingY + cellHeightHidden * i + 15, 15, 0, Math.PI * 2);
+            this.ctx.arc(
+                this.canvasWidth / 2,
+                paddingY + cellHeightHidden * i + 15,
+                15,
+                0,
+                Math.PI * 2
+            );
         }
         this.ctx.fill();
     }
@@ -81,13 +90,24 @@ export default class NetworkInterface {
 
         const cellHeightOutput = (height + paddingY) / outputNodes;
         for (let i = 0; i < outputNodes; i++) {
-            this.ctx.arc(600 - paddingX - 15, paddingY + cellHeightOutput * i + 15, 15, 0, Math.PI * 2);
+            this.ctx.arc(
+                this.canvasWidth - paddingX - 15,
+                paddingY + cellHeightOutput * i + 15,
+                15,
+                0,
+                Math.PI * 2
+            );
         }
         this.ctx.fill();
 
         this.ctx.beginPath();
         this.ctx.fillStyle = 'green';
-        this.ctx.arc(600 - paddingX - 15, paddingY + cellHeightOutput * this.activeOutput + 15, 15, 0, Math.PI * 2);
+        this.ctx.arc(this.canvasWidth - paddingX - 15,
+            paddingY + cellHeightOutput * this.activeOutput + 15,
+            15,
+            0,
+            Math.PI * 2
+        );
         this.ctx.fill();
     }
 
@@ -101,7 +121,7 @@ export default class NetworkInterface {
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = 'red';
                 this.ctx.moveTo(15 + paddingX, paddingY + cellHeightInput * i + 15);
-                this.ctx.lineTo(300, paddingY + cellHeightHidden * j + 15);
+                this.ctx.lineTo(this.canvasWidth / 2, paddingY + cellHeightHidden * j + 15);
                 this.ctx.stroke();
             }
         }
@@ -116,8 +136,8 @@ export default class NetworkInterface {
                 this.ctx.beginPath();
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = 'blue';
-                this.ctx.moveTo(300, paddingY + cellHeightHidden * i + 15);
-                this.ctx.lineTo(600 - paddingX - 15, paddingY + cellHeightOutput * j + 15);
+                this.ctx.moveTo(this.canvasWidth / 2, paddingY + cellHeightHidden * i + 15);
+                this.ctx.lineTo(this.canvasWidth - paddingX - 15, paddingY + cellHeightOutput * j + 15);
                 this.ctx.stroke();
             }
         }
@@ -127,7 +147,7 @@ export default class NetworkInterface {
         this.ctx.font = '14px Arial';
         const cellHeightOutput = (height + paddingY) / outputNodes;
         for (let i = 0; i < outputNodes; i++) {
-            this.ctx.fillText(this.ACTIONS[i], 600 - paddingX + 5, paddingY + 20 + cellHeightOutput * i);
+            this.ctx.fillText(this.ACTIONS[i], this.canvasWidth - paddingX + 5, paddingY + 20 + cellHeightOutput * i);
         }
     }
 
@@ -136,7 +156,7 @@ export default class NetworkInterface {
         const cellHeightInput = (height + paddingY) / inputNodes;
         for (let i = 0; i < inputNodes; i++) {
             const w = this.ctx.measureText('this.inputs[i].toFixed(2)').width;
-            this.ctx.fillText(this.inputs[i].toFixed(2), paddingX + 5 - w/2, paddingY + 20 + cellHeightInput * i);
+            this.ctx.fillText(this.inputs[i].toFixed(2), paddingX + 5 - w / 2, paddingY + 20 + cellHeightInput * i);
         }
     }
 }
