@@ -2,6 +2,7 @@ import Entity from "../Entities/Entity";
 import Fighter from "../Entities/Contestants/Fighter";
 import Shot from "../Entities/Shot";
 import Manager from "../Manager";
+import FighterData from "../FighterData";
 
 export default class Simulation {
     protected entities: Entity[] = [];
@@ -11,9 +12,19 @@ export default class Simulation {
     protected winner: Fighter;
     protected killed: boolean = false;
     protected stopped: boolean = false;
+    protected initialFighters: FighterData[] = [];
 
-    constructor(maxTime: number, waiting: boolean = false) {
+    constructor(maxTime: number, waiting: boolean = false, fighter1?: FighterData, fighter2?: FighterData) {
         this.timer = maxTime;
+
+        if (fighter1) {
+            this.initialFighters.push(fighter1);
+        }
+
+        if (fighter2) {
+            this.initialFighters.push(fighter2);
+        }
+
         if (waiting) {
             return;
         }
@@ -23,6 +34,7 @@ export default class Simulation {
 
     public start(): void {
         this.spawnFighters();
+        Manager.Instance.simulationStarted(this);
 
         this.lastFrame = new Date().getTime();
         requestAnimationFrame(this.loop.bind(this));
@@ -33,13 +45,14 @@ export default class Simulation {
     }
 
     private loop() {
+        if (this.stopped) {
+            return;
+        }
+
         const deltaTime = (new Date().getTime() - this.lastFrame) / 1000;
         this.lastFrame = new Date().getTime();
 
         this.update(deltaTime);
-        if (this.stopped) {
-            return;
-        }
 
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -87,8 +100,14 @@ export default class Simulation {
     }
 
     protected spawnFighters(): void {
-        this.addEntity(new Fighter(200, 150, this));
-        this.addEntity(new Fighter(400, 450, this));
+        if (this.initialFighters.length === 0) {
+            this.addEntity(new Fighter(200, 150, this));
+            this.addEntity(new Fighter(400, 450, this));
+            return;
+        }
+
+        this.addEntity(this.initialFighters[0].toFighter(200, 150, this, null, null, null));
+        this.addEntity(this.initialFighters[1].toFighter(400, 450, this, null, null, null, true));
     }
 
     protected pickRandomWinner(): void
@@ -117,5 +136,6 @@ export default class Simulation {
 
     public stop(): void {
         this.stopped = true;
+        Manager.Instance.simulationStopped(this);
     }
 }

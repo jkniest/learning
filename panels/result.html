@@ -1,11 +1,54 @@
 <div id="panel-result" class="hidden">
     <div class="flex space-x-3 items-center">
-        <h1 class="text-3xl">Generation 1</h1>
+        <h1 class="text-3xl">Generation <span id="result-generation">0</span></h1>
     </div>
 
     <div class="flex justify-between mt-10 w-full">
         <div class="w-[200px] h-[200px]">
             <canvas width="400" height="400" class="bg-red-50" id="result"></canvas>
+        </div>
+
+        <div class="ml-auto grid grid-cols-2 gap-3">
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-next-gen"
+            >
+                Run next generation
+            </button>
+
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-next-gen-fast"
+                    disabled
+            >
+                Fast forward
+            </button>
+
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-auto-run"
+                    disabled
+            >
+                Auto run
+            </button>
+
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-all-winners"
+                    disabled
+            >
+                See all winners
+            </button>
+
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-all-generations"
+                    disabled
+            >
+                See all generations
+            </button>
+
+            <button class="w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 disabled:bg-gray-500 hover:bg-indigo-700 disabled:opacity-25"
+                    id="btn-save"
+                    disabled
+            >
+                Save progress
+            </button>
         </div>
     </div>
 

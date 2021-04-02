@@ -5,10 +5,12 @@ import RepeatedSimulation from "./Simulations/RepeatedSimulation";
 import Manager from "./Manager";
 
 export default class Result {
-    private total: number = 0;
-    private draw: number = 0;
-    private defeated: number = 0;
-    private simulations: Simulation[];
+    private readonly total: number = 0;
+    private readonly draw: number = 0;
+    private readonly defeated: number = 0;
+    private readonly simulations: Simulation[];
+
+    private static chart: Chart;
 
     constructor(simulations: Simulation[]) {
         this.simulations = simulations;
@@ -16,16 +18,25 @@ export default class Result {
         this.draw = simulations.filter(simulation => simulation.wasDraw).length;
         this.defeated = this.total - this.draw;
 
+        Result.registerListeners();
         this.stopSimulations();
         this.pickRandomWinners();
         this.drawChart();
+
+        document.getElementById('result-generation').innerText = Manager.Instance.getCurrentGeneration().index.toString();
     }
 
     private pickRandomWinners(): void {
-        this.shuffle();
+        let winners = this.simulations.filter(simulation => !simulation.wasDraw)
+            .map(simulation => simulation.getWinner());
 
-        const winners = this.simulations.slice(0, 4).map(simulation => simulation.getWinner());
-        for (let i = 0; i < winners.length; i++) {
+        let notSoWinner = this.simulations.filter(simulation => simulation.wasDraw)
+            .map(simulation => simulation.getWinner())
+            .shuffle();
+
+        winners.push(...notSoWinner);
+
+        for (let i = 0; i < 4; i++) {
             const winnerBox = document.getElementById(`winner-${i + 1}`);
             winnerBox.classList.remove('hidden');
             document.getElementById(`winnerName${i + 1}`).innerText = winners[i].getName();
@@ -34,12 +45,12 @@ export default class Result {
             );
 
             winnerBox.addEventListener('click', () => {
-                this.repeat(winners[i]);
+                Result.repeat(winners[i]);
             });
         }
     }
 
-    private repeat(winner: Fighter) {
+    private static repeat(winner: Fighter): void {
         const simulation = new RepeatedSimulation(
             Manager.Instance.getMaxTime(),
             document.getElementById('canvas') as HTMLCanvasElement
@@ -79,7 +90,7 @@ export default class Result {
     private drawChart(): void {
         const canvas = document.getElementById('result') as HTMLCanvasElement;
 
-        new Chart(canvas.getContext('2d'), {
+        Result.chart = new Chart(canvas.getContext('2d'), {
             type: 'pie',
             data: {
                 labels: ['Draw', 'Defeat'],
@@ -103,20 +114,44 @@ export default class Result {
                     }
                 }
             }
-        })
+        });
     }
 
-    private shuffle(): void {
+    private static shuffle(input: Fighter[]): Fighter[] {
         let j, x, i;
-        for (i = this.simulations.length - 1; i > 0; i--) {
+        for (i = input.length - 1; i > 0; i--) {
             j = Math.floor(Math.random() * (i + 1));
-            x = this.simulations[i];
-            this.simulations[i] = this.simulations[j];
-            this.simulations[j] = x;
+            x = input[i];
+            input[i] = input[j];
+            input[j] = x;
         }
+
+        return input;
     }
 
     private stopSimulations(): void {
         this.simulations.forEach(simulation => simulation.stop());
+    }
+
+    private static registerListeners(): void {
+        document.getElementById('btn-next-gen').addEventListener('click', Result.actionRunNextGeneration);
+    }
+
+    private static clearListeners() {
+        document.getElementById('btn-next-gen').removeEventListener('click', Result.actionRunNextGeneration);
+
+        for(let i = 1; i <= 4; i++) {
+            const element = document.getElementById(`winner-${i}`);
+            const clone = element.cloneNode(true);
+            element.parentNode.replaceChild(clone, element);
+        }
+
+
+        Result.chart.destroy();
+    }
+
+    private static actionRunNextGeneration(): void {
+        Result.clearListeners();
+        Manager.Instance.startNewGeneration();
     }
 }

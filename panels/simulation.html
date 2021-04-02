@@ -1,6 +1,6 @@
 <div id="panel-simulation" class="hidden">
     <div class="flex space-x-3 items-center">
-        <h1 class="text-3xl">Generation 1</h1>
+        <h1 class="text-3xl">Generation <span id="counter-generation">0</span></h1>
 
         <div>Running: <span id="counter-running">0</span></div>
         <div>|</div>
@@ -17,6 +17,7 @@
                 <canvas id="preview" width="100px" height="100px" class="bg-red-50 mt-3"></canvas>
                 <div class="p-3">
                     <h2 id="name" class="text-2xl">Fighter 1</h2>
+                    <p>Since generation <span id="name-gen">0</span></p>
                 </div>
             </div>
         </div>
@@ -27,6 +28,7 @@
                 <canvas id="preview2" width="100px" height="100px" class="bg-red-50 mt-3"></canvas>
                 <div class="p-3">
                     <h2 id="name2" class="text-2xl">Fighter 2</h2>
+                    <p>Since generation <span id="name2-gen">0</span></p>
                 </div>
             </div>
         </div>

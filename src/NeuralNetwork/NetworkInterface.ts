@@ -147,6 +147,7 @@ export default class NetworkInterface {
         this.ctx.font = '14px Arial';
         const cellHeightOutput = (height + paddingY) / outputNodes;
         for (let i = 0; i < outputNodes; i++) {
+            this.ctx.fillStyle = i == this.activeOutput ? 'green' : 'blue';
             this.ctx.fillText(this.ACTIONS[i], this.canvasWidth - paddingX + 5, paddingY + 20 + cellHeightOutput * i);
         }
     }

@@ -2,11 +2,14 @@ import Simulation from "./Simulations/Simulation";
 import PrimarySimulation from "./Simulations/PrimarySimulation";
 import RenderingSimulation from "./Simulations/RenderingSimulation";
 import Result from "./Result";
+import Generation from "./Generation";
+import Fighter from "./Entities/Contestants/Fighter";
+import FighterData from "./FighterData";
 
 export default class Manager {
     public static Instance: Manager;
 
-    private parallelSimulations: number = 100;
+    private parallelSimulations: number = 1;
     private speed: number = 1;
     private time: number = 5;
     private showCollisionBoxes: boolean = false;
@@ -14,9 +17,15 @@ export default class Manager {
     private counterRunning: HTMLSpanElement;
     private counterFinished: HTMLSpanElement;
     private counterTotal: HTMLSpanElement;
+    private counterGeneration: HTMLSpanElement;
 
     private finished: number = 0;
     private simulations: Simulation[] = [];
+
+    private generations: Generation[] = [];
+    private currentGeneration: Generation;
+
+    private runningSimulations: Simulation[] = [];
 
     constructor() {
         Manager.Instance = this;
@@ -24,6 +33,7 @@ export default class Manager {
         this.counterRunning = document.getElementById('counter-running') as HTMLSpanElement;
         this.counterFinished = document.getElementById('counter-finished') as HTMLSpanElement;
         this.counterTotal = document.getElementById('counter-total') as HTMLSpanElement;
+        this.counterGeneration = document.getElementById('counter-generation') as HTMLSpanElement;
 
         const buttonStartSlow = document.getElementById('btn-start-slow') as HTMLButtonElement;
         buttonStartSlow.addEventListener('click', () => {
@@ -31,7 +41,7 @@ export default class Manager {
             this.speed = parseInt((document.getElementById('speed') as HTMLInputElement).value);
             this.time = parseInt((document.getElementById('time') as HTMLInputElement).value);
 
-            this.startSimulations();
+            this.startNewGeneration();
         });
 
         const buttonCollision = document.getElementById('btn-collision') as HTMLButtonElement;
@@ -41,20 +51,26 @@ export default class Manager {
             this.toggleCollisionBoxes(buttonCollision);
         }
 
-        //this.startSimulations();
+        // this.startNewGeneration();
     }
 
-    private startSimulations(): void {
+    private startSimulations(original?: FighterData[], mutated?: FighterData[]): void {
+        this.simulations = [];
+        this.finished = 0;
         this.updateCounter();
 
         document.getElementById('panel-menu').classList.add('hidden');
+        document.getElementById('panel-result').classList.add('hidden');
         document.getElementById('panel-simulation').classList.remove('hidden');
 
         for (let i = 0; i < this.parallelSimulations; i++) {
             if (i === 0) {
                 this.simulations.push(new PrimarySimulation(
                     this.time,
-                    document.getElementById('canvas') as HTMLCanvasElement
+                    document.getElementById('canvas') as HTMLCanvasElement,
+                    false,
+                    original?.[i],
+                    mutated?.[i],
                 ));
                 continue;
             }
@@ -62,12 +78,15 @@ export default class Manager {
             if (i > 0 && i < 5) {
                 this.simulations.push(new RenderingSimulation(
                     this.time,
-                    document.getElementById(`sub-${i}`) as HTMLCanvasElement
+                    document.getElementById(`sub-${i}`) as HTMLCanvasElement,
+                    false,
+                    original?.[i],
+                    mutated?.[i]
                 ));
                 continue;
             }
 
-            this.simulations.push(new Simulation(this.time));
+            this.simulations.push(new Simulation(this.time, false, original?.[i], mutated?.[i]));
         }
     }
 
@@ -115,6 +134,47 @@ export default class Manager {
 
     public getMaxTime(): number {
         return this.time;
+    }
+
+    public startNewGeneration(): void {
+        this.runningSimulations.forEach(simulation => simulation.stop());
+
+        if (!this.currentGeneration) {
+            this.currentGeneration = new Generation(1);
+            this.generations.push(this.currentGeneration);
+            this.counterGeneration.innerText = this.currentGeneration.index.toString();
+            this.startSimulations();
+            return;
+        }
+
+        this.currentGeneration = new Generation(this.currentGeneration.index + 1);
+        this.generations.push(this.currentGeneration);
+        this.counterGeneration.innerText = this.currentGeneration.index.toString();
+
+        const winners = this.simulations.map(simulation => simulation.getWinner());
+
+        const newFighters = [
+            ...winners.map(winner => FighterData.fromFighter(winner)),
+            ...winners.map(winner => FighterData.fromFighter(winner).mutate(.5)).shuffle()
+        ].shuffle();
+
+        this.startSimulations(
+            newFighters.slice(0, 500),
+            newFighters.slice(500, 1000),
+        );
+    }
+
+    public getCurrentGeneration(): Generation {
+        return this.currentGeneration;
+    }
+
+    public simulationStarted(simulation: Simulation): void {
+        this.runningSimulations.push(simulation);
+    }
+
+    public simulationStopped(simulation: Simulation): void {
+        const index = this.runningSimulations.indexOf(simulation);
+        this.runningSimulations.splice(index, 1);
     }
 }
 

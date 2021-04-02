@@ -19,10 +19,11 @@ export default class Fighter extends Entity {
     private readonly simulation: Simulation;
 
     private shootDelay = 1;
-    private network: Network;
+    private readonly network: Network;
     private enemy: Fighter;
     private killed: boolean = false;
     private readonly name: string;
+    private readonly originalGeneration: number;
 
     public readonly SPEED = 3;
 
@@ -45,12 +46,15 @@ export default class Fighter extends Entity {
         green?: number,
         blue?: number,
         name?: string,
-        serializedNetwork?: string
+        serializedNetwork?: string,
+        originalGeneration?: number
     ) {
         super(posX, posY, 60, 60);
 
         this.startX = posX;
         this.startY = posY;
+
+        this.originalGeneration = originalGeneration ?? Manager.Instance.getCurrentGeneration().index;
 
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
@@ -59,13 +63,14 @@ export default class Fighter extends Entity {
 
         this.network = serializedNetwork
             ? Network.fromSerialized(serializedNetwork, networkCanvas)
-            : new Network(9, 6, 7, networkCanvas);
+            : new Network(9, 4, 7, networkCanvas);
 
         this.preview = previewCanvas?.getContext('2d');
 
         this.name = name ?? names[Math.round(Math.random() * names.length)];
         if (nameField) {
             nameField.innerText = this.name;
+            document.getElementById(nameField.id + "-gen").innerText = this.originalGeneration.toString();
         }
     }
 
@@ -266,5 +271,9 @@ export default class Fighter extends Entity {
 
     public getStartY(): number {
         return this.startY;
+    }
+
+    public getOriginalGeneration(): number {
+        return this.originalGeneration;
     }
 }

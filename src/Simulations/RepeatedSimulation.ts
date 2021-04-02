@@ -24,10 +24,12 @@ export default class RepeatedSimulation extends RenderingSimulation {
 
     protected terminate() {
         this.running = false;
+        this.stop();
     }
 
     public lose(loser: Fighter) {
         this.running = false;
         this.killed = true;
+        this.stop();
     }
 }

@@ -1,11 +1,13 @@
 import Simulation from "./Simulation";
+import Fighter from "../Entities/Contestants/Fighter";
+import FighterData from "../FighterData";
 
 export default class RenderingSimulation extends Simulation {
     protected readonly canvas: HTMLCanvasElement;
     protected readonly ctx: CanvasRenderingContext2D;
 
-    constructor(maxTime: number, canvas: HTMLCanvasElement, waiting: boolean = false) {
-        super(maxTime, waiting);
+    constructor(maxTime: number, canvas: HTMLCanvasElement, waiting: boolean = false, fighter1?: FighterData, fighter2?: FighterData) {
+        super(maxTime, waiting, fighter1, fighter2);
 
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');

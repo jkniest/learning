@@ -2,7 +2,7 @@ import NetworkInterface from "./NetworkInterface";
 
 export default class Network {
     private readonly inputNodes: number;
-    private readonly hiddenNodes: number;
+    private hiddenNodes: number;
     private readonly outputNodes: number;
 
     private weightsHidden: number[] = [];
@@ -115,5 +115,73 @@ export default class Network {
             weightsOutput: this.weightsOutput,
             biases: this.biases
         });
+    }
+
+    public mutate(chance: number, rate: number): Network {
+        this.weightsOutput = this.weightsOutput.map(weight => {
+            if (Math.random() * 100 < chance) {
+                return weight + Math.random() * (rate * 2 + 1) - rate;
+            }
+
+            return weight;
+        });
+
+        this.weightsHidden = this.weightsHidden.map(weight => {
+            if (Math.random() * 100 < chance) {
+                return weight + Math.random() * (rate * 2 + 1) - rate;
+            }
+
+            return weight;
+        });
+
+        this.biases = this.biases.map(bias => {
+            if (Math.random() * 100 < chance) {
+                return bias + Math.random() * (rate * 2 + 1) - rate;
+            }
+
+            return bias;
+        });
+
+        if (Math.random() * 100 < chance) {
+            // Add or remove hidden layer
+            if (Math.random() * 100 < 50 && this.hiddenNodes > 1) {
+                this.removeHiddenNode();
+            } else {
+                this.addHiddenNode();
+            }
+        }
+
+        return this;
+    }
+
+    private removeHiddenNode(): void {
+        const indexToDelete = Math.floor(Math.random() * this.hiddenNodes);
+        for (let i = 0; i < this.inputNodes; i++) {
+            delete this.weightsHidden[indexToDelete + (i * this.hiddenNodes)];
+        }
+        this.weightsHidden = this.weightsHidden.flat();
+
+        for(let i = 0; i < this.outputNodes; i++) {
+            delete this.weightsOutput[indexToDelete * this.outputNodes + i];
+        }
+        this.weightsOutput = this.weightsOutput.flat();
+
+        delete this.biases[indexToDelete];
+        this.biases = this.biases.flat();
+
+        this.hiddenNodes--;
+    }
+
+    private addHiddenNode(): void {
+        this.hiddenNodes++;
+        for(let i = 0; i < this.inputNodes; i++) {
+            this.weightsHidden.push(Math.random());
+        }
+
+        for(let i = 0; i < this.outputNodes; i++) {
+            this.weightsOutput.push(Math.random());
+        }
+
+        this.biases.push(Math.random());
     }
 }
