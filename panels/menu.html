@@ -8,7 +8,7 @@
             <div class="mt-3 grid grid-cols-4">
                 <div>
                     <label for="count" class="block text-lg">Parallel simulations</label>
-                    <input type="number" id="count" class="h-10 px-3 w-20" value="100">
+                    <input type="number" id="count" class="h-10 px-3 w-20" value="500" min="1">
                 </div>
 
                 <div>
@@ -16,7 +16,11 @@
                     <input type="number" id="strength" class="h-10 px-3 w-20" value="1">
                 </div>
 
-                <div></div>
+                <div>
+                    <label for="speed" class="block text-lg">Speed</label>
+                    <input type="number" id="speed" class="h-10 px-3 w-20" value="1">
+                </div>
+
                 <div></div>
             </div>
         </div>
@@ -28,8 +32,9 @@
                 See first fight
             </button>
 
-            <button class="ml-5 w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 hover:bg-indigo-700"
+            <button class="ml-5 w-64 h-12 text-lg uppercase font-bold tracking-wide text-indigo-50 bg-indigo-500 hover:bg-indigo-700 disabled:bg-gray-500"
                     id="btn-start-fast"
+                    disabled
             >
                 Start simulation
             </button>

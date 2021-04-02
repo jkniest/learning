@@ -1,11 +1,11 @@
 import Entity from "../Entities/Entity";
 import Fighter from "../Entities/Contestants/Fighter";
 import Shot from "../Entities/Shot";
+import Manager from "../Manager";
 
 export default class Simulation {
     protected entities: Entity[] = [];
     protected lastFrame = 0;
-    protected speed: number = 1;
     protected timer: number = 5;
     protected running: boolean = true;
     protected winner: Fighter;
@@ -48,7 +48,7 @@ export default class Simulation {
     }
 
     public getSpeed(): number {
-        return this.speed;
+        return Manager.Instance.getSpeed();
     }
 
     protected update(deltaTime: number) {
@@ -56,7 +56,7 @@ export default class Simulation {
             return;
         }
 
-        this.timer -= deltaTime;
+        this.timer -= deltaTime * Manager.Instance.getSpeed();
 
         this.entities.forEach(entity => entity.update(deltaTime));
 
@@ -68,6 +68,8 @@ export default class Simulation {
     private terminate() {
         this.pickRandomWinner();
         this.running = false;
+
+        Manager.Instance.report(this);
     }
 
     protected spawnFighters(): void {

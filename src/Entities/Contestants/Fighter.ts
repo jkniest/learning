@@ -2,6 +2,8 @@ import Entity from "../Entity";
 import Shot from "../Shot";
 import Network from "../../NeuralNetwork/Network";
 import Simulation from "../../Simulations/Simulation";
+
+// @ts-ignore
 import names from '../../names.json';
 
 export default class Fighter extends Entity {
