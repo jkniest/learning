@@ -10,6 +10,7 @@ export default class Simulation {
     protected running: boolean = true;
     protected winner: Fighter;
     protected killed: boolean = false;
+    protected stopped: boolean = false;
 
     constructor(maxTime: number) {
         this.timer = maxTime;
@@ -28,6 +29,9 @@ export default class Simulation {
         this.lastFrame = new Date().getTime();
 
         this.update(deltaTime);
+        if (this.stopped) {
+            return;
+        }
 
         requestAnimationFrame(this.loop.bind(this));
     }
@@ -93,5 +97,17 @@ export default class Simulation {
         this.killed = true;
 
         Manager.Instance.report(this);
+    }
+
+    public get wasDraw(): boolean {
+        return !this.killed;
+    }
+
+    public getWinner(): Fighter {
+        return this.winner;
+    }
+
+    public stop(): void {
+        this.stopped = true;
     }
 }

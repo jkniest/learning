@@ -37,12 +37,7 @@ export default class Shot extends Entity {
         ctx.fill();
         ctx.stroke();
 
-        if (Manager.Instance.collisionBoxes) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'green';
-            ctx.rect(this.leftX, this.topY, this.width, this.height);
-            ctx.stroke();
-        }
+        this.drawCollisionBox(ctx);
     }
 
     update(deltaTime: number): void {

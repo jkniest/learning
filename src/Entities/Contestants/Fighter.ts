@@ -12,7 +12,7 @@ export default class Fighter extends Entity {
     private readonly green: number = 0;
     private readonly blue: number = 0;
 
-    private readonly preview: CanvasRenderingContext2D | null;
+    private preview: CanvasRenderingContext2D | null;
     private readonly simulation: Simulation;
 
     private shootDelay = 1;
@@ -85,14 +85,14 @@ export default class Fighter extends Entity {
             ctx.stroke();
         }
 
-        if (Manager.Instance.collisionBoxes) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'green';
-            ctx.rect(this.leftX, this.topY, this.width, this.height);
-            ctx.stroke();
-        }
+        this.drawCollisionBox(ctx);
 
         this.network.draw();
+        this.drawPreview();
+    }
+
+    public setPreview(canvas: HTMLCanvasElement) {
+        this.preview = canvas.getContext('2d');
         this.drawPreview();
     }
 

@@ -1,6 +1,7 @@
 import Simulation from "./Simulations/Simulation";
 import PrimarySimulation from "./Simulations/PrimarySimulation";
 import RenderingSimulation from "./Simulations/RenderingSimulation";
+import Result from "./Result";
 
 export default class Manager {
     public static Instance: Manager;
@@ -15,6 +16,7 @@ export default class Manager {
     private counterTotal: HTMLSpanElement;
 
     private finished: number = 0;
+    private simulations: Simulation[] = [];
 
     constructor() {
         Manager.Instance = this;
@@ -33,12 +35,13 @@ export default class Manager {
         });
 
         const buttonCollision = document.getElementById('btn-collision') as HTMLButtonElement;
-        buttonCollision.addEventListener('click', () => {
-            this.showCollisionBoxes = !this.showCollisionBoxes;
-            buttonCollision.innerText = this.showCollisionBoxes ? 'Hide collision boxes' : 'Show collision boxes';
-        });
+        buttonCollision.addEventListener('click', () => this.toggleCollisionBoxes(buttonCollision));
 
-        // this.startSimulations();
+        if(localStorage.getItem('collision') === '1') {
+            this.toggleCollisionBoxes(buttonCollision);
+        }
+
+        //this.startSimulations();
     }
 
     private startSimulations(): void {
@@ -49,22 +52,22 @@ export default class Manager {
 
         for (let i = 0; i < this.parallelSimulations; i++) {
             if (i === 0) {
-                new PrimarySimulation(
+                this.simulations.push(new PrimarySimulation(
                     this.time,
                     document.getElementById('canvas') as HTMLCanvasElement
-                );
+                ));
                 continue;
             }
 
             if (i > 0 && i < 5) {
-                new RenderingSimulation(
+                this.simulations.push(new RenderingSimulation(
                     this.time,
                     document.getElementById(`sub-${i}`) as HTMLCanvasElement
-                );
+                ));
                 continue;
             }
 
-            new Simulation(this.time);
+            this.simulations.push(new Simulation(this.time));
         }
     }
 
@@ -77,6 +80,10 @@ export default class Manager {
     public report(simulation: Simulation) {
         this.finished++;
         this.updateCounter();
+
+        if (this.finished >= this.parallelSimulations) {
+            this.endGeneration();
+        }
     }
 
     public getSpeed(): number {
@@ -85,6 +92,25 @@ export default class Manager {
 
     public get collisionBoxes(): boolean {
         return this.showCollisionBoxes;
+    }
+
+    private toggleCollisionBoxes(buttonCollision: HTMLButtonElement): void {
+        this.showCollisionBoxes = !this.showCollisionBoxes;
+        buttonCollision.innerText = this.showCollisionBoxes ? 'Hide collision boxes' : 'Show collision boxes';
+
+        if (this.showCollisionBoxes) {
+            localStorage.setItem('collision', '1');
+            return;
+        }
+
+        localStorage.removeItem('collision');
+    }
+
+    private endGeneration(): void {
+        document.getElementById('panel-simulation').classList.add('hidden');
+        document.getElementById('panel-result').classList.remove('hidden');
+
+        new Result(this.simulations);
     }
 }
 

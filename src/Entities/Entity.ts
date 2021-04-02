@@ -1,3 +1,5 @@
+import Manager from "../Manager";
+
 export default abstract class Entity {
     protected posX: number;
     protected posY: number;
@@ -49,5 +51,17 @@ export default abstract class Entity {
             this.leftX + this.width > target.leftX &&
             this.topY < target.topY + target.height &&
             this.topY + this.height > target.topY;
+    }
+
+    public drawCollisionBox(ctx: CanvasRenderingContext2D): void {
+        if (!Manager.Instance.collisionBoxes) {
+            return;
+        }
+
+        ctx.beginPath();
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 1;
+        ctx.rect(this.leftX, this.topY, this.width, this.height);
+        ctx.stroke();
     }
 }
