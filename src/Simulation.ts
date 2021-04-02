@@ -13,8 +13,8 @@ export default class Simulation {
     constructor() {
         Simulation.Instance = this;
 
-        this.addEntity(new Fighter(200, 200, true));
-        this.addEntity(new Fighter(400, 400));
+        this.addEntity(new Fighter(200, 150, true));
+        this.addEntity(new Fighter(400, 450, true));
 
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.context = this.canvas.getContext('2d');

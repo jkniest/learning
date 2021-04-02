@@ -27,7 +27,7 @@ export default class Fighter extends Entity {
         this.red = red ?? (Math.random() * 255);
         this.green = green ?? (Math.random() * 255);
         this.blue = blue ?? (Math.random() * 255);
-        this.network = new Network(9, 7, render);
+        this.network = new Network(9, 4, 7, render);
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {

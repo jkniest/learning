@@ -2,17 +2,31 @@ import NetworkInterface from "./NetworkInterface";
 
 export default class Network
 {
-    private inputNodes: number;
-    private outputNodes: number;
-    private weights: number[] = [];
+    private readonly inputNodes: number;
+    private readonly hiddenNodes: number;
+    private readonly outputNodes: number;
+
+    private weightsHidden: number[] = [];
+    private weightsOutput: number[] = [];
+    private biases: number[] = [];
+
     private nInterface?: NetworkInterface;
 
-    constructor(inputNodes: number, outputNodes: number, render: boolean) {
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, render: boolean) {
         this.inputNodes = inputNodes;
+        this.hiddenNodes = hiddenNodes;
         this.outputNodes = outputNodes;
 
-        for(let i = 0; i < inputNodes*outputNodes; i++) {
-            this.weights[i] = Math.random();
+        for(let i = 0; i < inputNodes*hiddenNodes; i++) {
+            this.weightsHidden[i] = Math.random();
+        }
+
+        for(let i = 0; i < hiddenNodes*outputNodes; i++) {
+            this.weightsOutput[i] = Math.random();
+        }
+
+        for(let i = 0; i < hiddenNodes+outputNodes; i++) {
+            this.biases[i] = Math.random();
         }
 
         if (render) {
@@ -43,11 +57,22 @@ export default class Network
     {
         let result = 0;
 
-        for(let input = 0; input < this.inputNodes; input++) {
-            result += inputs[input] * this.weights[index * this.inputNodes + input];
+        for(let hidden = 0; hidden < this.hiddenNodes; hidden++) {
+            result += this.calculateHidden(hidden, inputs) * this.weightsOutput[index * this.hiddenNodes + hidden];
         }
 
-        return result;
+        return this.sigmoid(result + this.biases[this.hiddenNodes + index]);
+    }
+
+    private calculateHidden(index: number, inputs: number[]): number
+    {
+        let result = 0;
+
+        for(let input = 0; input < this.inputNodes; input++) {
+            result += inputs[input] * this.weightsHidden[index * this.inputNodes + input];
+        }
+
+        return this.sigmoid(result + this.biases[index]);
     }
 
     public draw(): void {
@@ -58,11 +83,19 @@ export default class Network
         return this.inputNodes;
     }
 
+    public getHiddenNodes(): number {
+        return this.hiddenNodes;
+    }
+
     public getOutputNodes(): number {
         return this.outputNodes;
     }
 
     public getWeights(): number[] {
-        return this.weights;
+        return this.weightsOutput;
+    }
+
+    private sigmoid(x: number): number {
+        return 1 / (1 + Math.pow(Math.E, -x));
     }
 }
