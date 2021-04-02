@@ -3,6 +3,8 @@ import PrimarySimulation from "./Simulations/PrimarySimulation";
 import RenderingSimulation from "./Simulations/RenderingSimulation";
 
 export default class Manager {
+    private parallelSimulations: number = 100;
+
     constructor() {
         const buttonStartSlow = document.getElementById('btn-start-slow') as HTMLButtonElement;
         buttonStartSlow.addEventListener('click', () => {
@@ -16,25 +18,23 @@ export default class Manager {
         document.getElementById('panel-menu').classList.add('hidden');
         document.getElementById('panel-simulation').classList.remove('hidden');
 
-        new PrimarySimulation(
-            document.getElementById('canvas') as HTMLCanvasElement
-        );
+        for(let i = 0; i < this.parallelSimulations; i++) {
+            if (i === 0) {
+                new PrimarySimulation(
+                    document.getElementById('canvas') as HTMLCanvasElement
+                );
+                continue;
+            }
 
-        new RenderingSimulation(
-            document.getElementById('sub-1') as HTMLCanvasElement
-        );
+            if (i > 0 && i < 5) {
+                new RenderingSimulation(
+                    document.getElementById(`sub-${i}`) as HTMLCanvasElement
+                );
+                continue;
+            }
 
-        new RenderingSimulation(
-            document.getElementById('sub-2') as HTMLCanvasElement
-        );
-
-        new RenderingSimulation(
-            document.getElementById('sub-3') as HTMLCanvasElement
-        );
-
-        new RenderingSimulation(
-            document.getElementById('sub-4') as HTMLCanvasElement
-        );
+            new Simulation();
+        }
     }
 }
 

@@ -2,6 +2,7 @@ import Entity from "../Entity";
 import Shot from "../Shot";
 import Network from "../../NeuralNetwork/Network";
 import Simulation from "../../Simulations/Simulation";
+import names from '../../names.json';
 
 export default class Fighter extends Entity {
     private readonly red: number = 0;
@@ -47,14 +48,10 @@ export default class Fighter extends Entity {
         this.network = new Network(9, 4, 7, networkCanvas);
         this.preview = previewCanvas?.getContext('2d');
 
-        fetch('https://randomuser.me/api/')
-            .then(response => response.json())
-            .then(data => {
-                this.name = data.results[0].name.first;
-                if (nameField) {
-                    nameField.innerText = this.name;
-                }
-            })
+        this.name = names[Math.round(Math.random() * names.length)];
+        if (nameField) {
+            nameField.innerText = this.name;
+        }
     }
 
     public draw(ctx: CanvasRenderingContext2D): void {
