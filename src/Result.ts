@@ -36,6 +36,18 @@ export default class Result {
 
         winners.push(...notSoWinner);
 
+        if (winners.length < 4) {
+            console.log("WINNER LESS THAN 4");
+            console.log("Simulations:")
+            console.log(this.simulations);
+
+            console.log("Winners:")
+            console.log(winners);
+
+            console.log("No so winners:")
+            console.log(notSoWinner);
+        }
+
         for (let i = 0; i < 4; i++) {
             const winnerBox = document.getElementById(`winner-${i + 1}`);
             winnerBox.classList.remove('hidden');

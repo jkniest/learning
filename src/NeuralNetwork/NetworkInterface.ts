@@ -45,11 +45,14 @@ export default class NetworkInterface {
         const inputNodes = this.network.getInputNodes();
         const outputNodes = this.network.getOutputNodes();
         const hiddenNodes = this.network.getHiddenNodes();
+        const hiddenNodes2 = this.network.getHiddenNodes2();
 
         this.renderInputToHiddenWeights(height, inputNodes, hiddenNodes, paddingX, paddingY);
-        this.renderHiddenToOutputWeights(height, hiddenNodes, outputNodes, paddingX, paddingY);
+        this.renderHiddenToHidden2Weights(height, hiddenNodes, hiddenNodes2, paddingX, paddingY);
+        this.renderHiddenToOutputWeights(height, hiddenNodes2, outputNodes, paddingX, paddingY);
         this.renderInput(height, inputNodes, paddingX, paddingY);
         this.renderHidden(height, hiddenNodes, paddingY);
+        this.renderHidden2(height, hiddenNodes2, paddingY);
         this.renderOutput(height, outputNodes, paddingX, paddingY);
         this.renderOutputLabels(height, paddingY, outputNodes, paddingX);
         this.renderInputLabels(height, paddingY, inputNodes, paddingX);
@@ -74,7 +77,24 @@ export default class NetworkInterface {
         const cellHeightHidden = (height + paddingY) / hiddenNodes;
         for (let i = 0; i < hiddenNodes; i++) {
             this.ctx.arc(
-                this.canvasWidth / 2,
+                this.canvasWidth / 2 - this.canvasWidth / 11,
+                paddingY + cellHeightHidden * i + 15,
+                15,
+                0,
+                Math.PI * 2
+            );
+        }
+        this.ctx.fill();
+    }
+
+    private renderHidden2(height: number, hiddenNodes: number, paddingY: number) {
+        this.ctx.beginPath();
+        this.ctx.fillStyle = 'pink';
+
+        const cellHeightHidden = (height + paddingY) / hiddenNodes;
+        for (let i = 0; i < hiddenNodes; i++) {
+            this.ctx.arc(
+                this.canvasWidth / 2 + this.canvasWidth / 11,
                 paddingY + cellHeightHidden * i + 15,
                 15,
                 0,
@@ -121,22 +141,38 @@ export default class NetworkInterface {
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = 'red';
                 this.ctx.moveTo(15 + paddingX, paddingY + cellHeightInput * i + 15);
-                this.ctx.lineTo(this.canvasWidth / 2, paddingY + cellHeightHidden * j + 15);
+                this.ctx.lineTo(this.canvasWidth / 2 - this.canvasWidth / 11, paddingY + cellHeightHidden * j + 15);
                 this.ctx.stroke();
             }
         }
     }
 
-    private renderHiddenToOutputWeights(height: number, hiddenNodes: number, outputNodes: number, paddingX: number, paddingY: number) {
+    private renderHiddenToHidden2Weights(height: number, hiddenNodes: number, hiddenNodes2: number, paddingX: number, paddingY: number) {
         const cellHeightHidden = (height + paddingY) / hiddenNodes;
-        const cellHeightOutput = (height + paddingY) / outputNodes;
+        const cellHeightHidden2 = (height + paddingY) / hiddenNodes2;
 
         for (let i = 0; i < hiddenNodes; i++) {
+            for (let j = 0; j < hiddenNodes2; j++) {
+                this.ctx.beginPath();
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = 'orange';
+                this.ctx.moveTo(this.canvasWidth / 2 - this.canvasWidth / 11, paddingY + cellHeightHidden * i + 15);
+                this.ctx.lineTo(this.canvasWidth / 2 + this.canvasWidth / 11, paddingY + cellHeightHidden2 * j + 15);
+                this.ctx.stroke();
+            }
+        }
+    }
+
+    private renderHiddenToOutputWeights(height: number, hiddenNodes2: number, outputNodes: number, paddingX: number, paddingY: number) {
+        const cellHeightHidden = (height + paddingY) / hiddenNodes2;
+        const cellHeightOutput = (height + paddingY) / outputNodes;
+
+        for (let i = 0; i < hiddenNodes2; i++) {
             for (let j = 0; j < outputNodes; j++) {
                 this.ctx.beginPath();
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeStyle = 'blue';
-                this.ctx.moveTo(this.canvasWidth / 2, paddingY + cellHeightHidden * i + 15);
+                this.ctx.moveTo(this.canvasWidth / 2 + this.canvasWidth / 11, paddingY + cellHeightHidden * i + 15);
                 this.ctx.lineTo(this.canvasWidth - paddingX - 15, paddingY + cellHeightOutput * j + 15);
                 this.ctx.stroke();
             }

@@ -1,6 +1,5 @@
 import Entity from "./Entity";
 import Simulation from "../Simulations/Simulation";
-import Manager from "../Manager";
 
 export default class Shot extends Entity {
     private readonly red: number = 0;

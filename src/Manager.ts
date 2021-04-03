@@ -9,7 +9,7 @@ import FighterData from "./FighterData";
 export default class Manager {
     public static Instance: Manager;
 
-    private parallelSimulations: number = 1;
+    private parallelSimulations: number = 100;
     private speed: number = 1;
     private time: number = 5;
     private showCollisionBoxes: boolean = false;
@@ -51,7 +51,7 @@ export default class Manager {
             this.toggleCollisionBoxes(buttonCollision);
         }
 
-        // this.startNewGeneration();
+        //this.startNewGeneration();
     }
 
     private startSimulations(original?: FighterData[], mutated?: FighterData[]): void {
@@ -151,16 +151,26 @@ export default class Manager {
         this.generations.push(this.currentGeneration);
         this.counterGeneration.innerText = this.currentGeneration.index.toString();
 
-        const winners = this.simulations.map(simulation => simulation.getWinner());
+        const winners = this.simulations.map(simulation => {
+            if (simulation.getWinner()) {
+                return simulation.getWinner();
+            }
+
+            console.log("ERROR NO WINNER")
+            console.log(simulation);
+
+            return simulation.getWinner();
+        });
+
 
         const newFighters = [
             ...winners.map(winner => FighterData.fromFighter(winner)),
-            ...winners.map(winner => FighterData.fromFighter(winner).mutate(.5)).shuffle()
+            ...winners.map(winner => FighterData.fromFighter(winner).mutate(.5))
         ].shuffle();
 
         this.startSimulations(
-            newFighters.slice(0, 500),
-            newFighters.slice(500, 1000),
+            newFighters.slice(0, this.parallelSimulations),
+            newFighters.slice(this.parallelSimulations, this.parallelSimulations * 2),
         );
     }
 

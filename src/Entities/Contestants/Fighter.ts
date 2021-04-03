@@ -62,8 +62,8 @@ export default class Fighter extends Entity {
         this.simulation = simulation;
 
         this.network = serializedNetwork
-            ? Network.fromSerialized(serializedNetwork, networkCanvas)
-            : new Network(9, 4, 7, networkCanvas);
+            ? Network.fromSerialized(serializedNetwork)
+            : new Network(9, [], 7);
 
         this.preview = previewCanvas?.getContext('2d');
 
@@ -101,7 +101,7 @@ export default class Fighter extends Entity {
 
         this.drawCollisionBox(ctx);
 
-        this.network.draw();
+        // TODO: DRAW network graph
         this.drawPreview();
     }
 
